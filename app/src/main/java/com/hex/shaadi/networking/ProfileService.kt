@@ -13,7 +13,7 @@ object ProfileService {
                 state = it.location.state,
                 gender = it.gender,
                 thumbnail = it.picture.thumbnail,
-                order = index
+                index = index
             )
         }
 }

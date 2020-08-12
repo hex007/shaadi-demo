@@ -30,6 +30,9 @@ data class Profile(
     @ColumnInfo(name = "thumbnail")
     val thumbnail: String = "",
 
-    @ColumnInfo(name = "order")
-    val order : Int = 0
+    @ColumnInfo(name = "index")
+    val index : Int = 0,
+
+    @ColumnInfo(name = "match_status")
+    var matchStatus: Int = 0
 )
