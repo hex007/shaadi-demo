@@ -40,10 +40,10 @@ class MatchesViewHolder(
         with(itemView.context as LifecycleOwner) {
             weakMatchesActionsInterface.get()?.also {
                 lifecycleScope.launch {
-                    it.setStatus(profile.uuid, newStatus)
+                    // Update profile status in cached data-set
                     profile.matchStatus = newStatus
-
-                    setupMatchStatus(newStatus)
+                    // handles viewholder invalidation
+                    it.setStatus(adapterPosition, profile.uuid, newStatus)
                 }
             }
         }

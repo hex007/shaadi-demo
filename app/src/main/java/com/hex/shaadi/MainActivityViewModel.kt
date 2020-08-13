@@ -13,7 +13,7 @@ import com.hex.shaadi.utils.rethrowIfCancellation
 import com.hex.shaadi.utils.withProgress
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel(application: Application) : AndroidViewModel(application), MatchesActionsInterface {
+class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
 
     val profiles = MutableLiveData<List<Profile>>()
     val errSnackbar = MutableLiveData<String>()
@@ -67,7 +67,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    override suspend fun setStatus(uuid: String, newStatus: Int) {
+    suspend fun setStatus(uuid: String, newStatus: Int) {
         // if caller scope is cancelled, this will still update the status in the db
         val job = viewModelScope.launch {
             profileRepo.updateStatus(uuid, newStatus)
