@@ -5,6 +5,7 @@
     android:id="@+id/activity_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#eeeeee"
     tools:context=".MainActivity">
 
     <ProgressBar
@@ -18,10 +19,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/matches_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:overScrollMode="ifContentScrolls"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="5" />
+        tools:itemCount="5"
+        tools:listitem="@layout/item_match" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

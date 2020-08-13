@@ -3,6 +3,7 @@ package com.hex.shaadi.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.hex.shaadi.model.MatchStatus.Companion.UNKNOWN
 
 @Entity(tableName = "profile_table")
 data class Profile(
@@ -34,5 +35,5 @@ data class Profile(
     val index : Int = 0,
 
     @ColumnInfo(name = "match_status")
-    var matchStatus: Int = 0
+    var matchStatus: Int = UNKNOWN
 )

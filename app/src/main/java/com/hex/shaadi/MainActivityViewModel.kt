@@ -8,11 +8,12 @@ import com.hex.shaadi.daos.AppDatabase
 import com.hex.shaadi.model.Profile
 import com.hex.shaadi.networking.ProfileService
 import com.hex.shaadi.repos.ProfileRepo
+import com.hex.shaadi.ui.MatchesActionsInterface
 import com.hex.shaadi.utils.rethrowIfCancellation
 import com.hex.shaadi.utils.withProgress
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
+class MainActivityViewModel(application: Application) : AndroidViewModel(application), MatchesActionsInterface {
 
     val profiles = MutableLiveData<List<Profile>>()
     val errSnackbar = MutableLiveData<String>()
@@ -26,6 +27,11 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun fetchData(maxProfileCount: Int = 10) {
+        if (profiles.value != null) {
+            // View recreated, data reload not needed
+            return
+        }
+
         viewModelScope.launch {
             try {
                 withProgress(loading) {
@@ -38,18 +44,34 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                             matchStatuses[profile.uuid]?.also { profile.matchStatus = it }
                         }
 
+                        // Note: Currently not using LiveData from Room itself since it will emit
+                        // twice, once on clearing and once on insertion. There are ways to counter
+                        // that by adding a delay to emit only the latest state.
                         profileRepo.deleteAll()
                         profileRepo.insertAll(newProfiles)
                         profiles.value = newProfiles
                     }.onFailure {
                         val oldProfiles = profileRepo.getAll()
-                        profiles.value = oldProfiles
+
+                        if (oldProfiles.isNotEmpty()) {
+                            profiles.value = oldProfiles
+                        } else {
+                            errSnackbar.value = "No profiles found, please ensure you are connected to the internet"
+                        }
                     }
                 }
             } catch (t: Throwable) {
                 t.rethrowIfCancellation()
-                errSnackbar.value = "Error fetching, showing offline profiles"
+                errSnackbar.value = "Unexpected error fetching profiles, please try again"
             }
         }
+    }
+
+    override suspend fun setStatus(uuid: String, newStatus: Int) {
+        // if caller scope is cancelled, this will still update the status in the db
+        val job = viewModelScope.launch {
+            profileRepo.updateStatus(uuid, newStatus)
+        }
+        job.join()
     }
 }
